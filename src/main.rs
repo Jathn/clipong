@@ -6,11 +6,12 @@ fn main() {
     let player_bat = Bat::new((0, HEIGHT / 2));
     let bot_bat = Bat::new((WIDTH - 1, HEIGHT / 2));
 
-    let mut state = State::new(ball, player_bat, bot_bat);
+    let mut state = State::new(ball, player_bat, bot_bat, (0, 0));
 
     let mut input = String::new();
     state.draw();
-    loop {
+
+    while state.score.0 < 3 && state.score.1 < 3 {
         input.clear();
         std::io::stdin().read_line(&mut input).unwrap();
         let action: Action = match input.trim() {
@@ -21,5 +22,12 @@ fn main() {
         };
         state.update(action);
         state.draw();
+    }
+
+    println!("Game over!");
+    if state.score.0 == 3 {
+        println!("Player won!");
+    } else {
+        println!("Bot won!");
     }
 }

@@ -33,7 +33,7 @@ impl Ball {
 
                 if player_hit || bot_hit {
                         self.bounce_horizontal();
-                        self.dir = (2 * self.dir.0, self.dir.1);
+                        self.dir = (self.dir.0, self.dir.1);
                 }
 
                 if self.pos.1 < 2 || self.pos.1 >= HEIGHT - 2 {

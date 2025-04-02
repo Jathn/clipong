@@ -8,15 +8,17 @@ pub struct State {
         pub ball: Ball,
         pub player_bat: Bat,
         pub bot_bat: Bat,
+        pub score: (u8, u8),
 }
 
 impl State {
-        pub fn new(ball: Ball, player_bat: Bat, bot_bat: Bat) -> Self {
-                State { ball, player_bat, bot_bat }
+        pub fn new(ball: Ball, player_bat: Bat, bot_bat: Bat, score: (u8, u8)) -> Self {
+                State { ball, player_bat, bot_bat, score }
         }
 
         pub fn draw(&self) {
                 print!("\x1B[2J\x1B[1;1H");
+                println!("Score: {} - {}", self.score.0, self.score.1);
                 for i in 0..HEIGHT*WIDTH {
                         let x: i8 = i % WIDTH;
                         let y: i8 = (i / WIDTH) % 10;
@@ -41,5 +43,17 @@ impl State {
                 self.player_bat.exec(player_act);
                 self.bot_bat.exec(bot_act);
                 self.ball.update(&self.player_bat, &self.bot_bat);
+
+                if self.ball.pos.0 < 0 {
+                        self.score.1 += 1;
+                        self.ball.pos = (WIDTH / 2, HEIGHT / 2);
+                        self.ball.dir = (1, 1);
+                }
+
+                if self.ball.pos.0 > WIDTH - 1 {
+                        self.score.0 += 1;
+                        self.ball.pos = (WIDTH / 2, HEIGHT / 2);
+                        self.ball.dir = (-1, 1);
+                }
         }
 }
