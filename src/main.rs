@@ -1,9 +1,10 @@
-const WIDTH: i8 = 16;
-const HEIGHT: i8 = 5;
+const WIDTH: i8 = 17;
+const HEIGHT: i8 = 7;
 
 enum Action {
     UP,
     DOWN,
+    STAY
 }
 
 struct State {
@@ -19,7 +20,6 @@ impl State {
 
     fn draw(&self) {
         print!("\x1B[2J\x1B[1;1H");
-        println!("{}, {}", self.ball.pos.0, self.ball.pos.1);
         for i in 0..HEIGHT*WIDTH {
             let x: i8 = i % WIDTH;
             let y: i8 = (i / WIDTH) % 10;
@@ -40,7 +40,7 @@ impl State {
     }
 
     fn update(&mut self, player_act: Action) {
-        let bot_act = self.bot_bat.calculate_action(self.ball.pos);
+        let bot_act = self.bot_bat.calculate_action(&self.ball.pos, &self.ball.dir);
 
         self.player_bat.exec(player_act);
         self.bot_bat.exec(bot_act);
@@ -73,11 +73,12 @@ impl Ball {
         self.pos.0 += self.dir.0;
         self.pos.1 += self.dir.1;
 
-        let player_hit: bool = self.pos.0 == bat_player.pos.0 && self.pos.1 == bat_player.pos.1;
-        let bot_hit: bool = self.pos.0 == bat_bot.pos.0 && self.pos.1 == bat_bot.pos.1;
+        let player_hit: bool = self.pos.0 == bat_player.pos.0 + 1 && self.pos.1 == bat_player.pos.1;
+        let bot_hit: bool = self.pos.0 == bat_bot.pos.0 - 1 && self.pos.1 == bat_bot.pos.1;
 
         if player_hit || bot_hit {
             self.bounce_horizontal();
+            self.dir = (2*self.dir.0, self.dir.1);
         }
 
         if self.pos.1 < 2 || self.pos.1 >= HEIGHT - 2 {
@@ -112,21 +113,28 @@ impl Bat {
     fn exec(&mut self, action: Action) {
         match action {
             Action::UP => self.up(),
-            Action::DOWN => self.down()
+            Action::DOWN => self.down(),
+            Action::STAY => {}
         }
     }
 
-    fn calculate_action(&self, ball_pos: (i8, i8)) -> Action {
-        if ball_pos.1 > self.pos.1 {
-            Action::UP
-        } else {
-            Action::DOWN
+    fn calculate_action(&self, ball_pos: &(i8, i8), ball_dir: &(i8, i8)) -> Action {
+        let ball_modifier_y = &ball_dir.1;
+
+        if ball_dir.0 < 0 {
+            return Action::STAY;
+        }
+
+        match (ball_pos.1, self.pos.1) {
+            (ball_y, self_y) if ball_y + ball_modifier_y < self_y => Action::UP,
+            (ball_y, self_y) if ball_y + ball_modifier_y > self_y => Action::DOWN,
+            _ => Action::STAY,
         }
     }
 }
 
 fn main() {
-    let ball = Ball::new((5, 1), (1, 1));
+    let ball = Ball::new((WIDTH / 2, HEIGHT / 2), (1, 1));
     let player_bat = Bat::new((0, HEIGHT / 2));
     let bot_bat = Bat::new((WIDTH - 1, HEIGHT / 2));
 
@@ -140,6 +148,7 @@ fn main() {
         let action: Action = match input.trim() {
             "w" => Action::UP,
             "s" => Action::DOWN,
+            "" => Action::STAY,
             _ => continue
         };
         state.update(action);
