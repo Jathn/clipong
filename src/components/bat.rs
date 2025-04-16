@@ -1,4 +1,3 @@
-// src/bat.rs
 use crate::gameplay::action::Action;
 use crate::constants::HEIGHT;
 

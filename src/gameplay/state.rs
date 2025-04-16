@@ -1,4 +1,3 @@
-// src/state.rs
 use crate::components::ball::Ball;
 use crate::components::bat::Bat;
 use crate::gameplay::action::Action;

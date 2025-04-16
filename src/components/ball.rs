@@ -1,4 +1,3 @@
-// src/ball.rs
 use crate::components::bat::Bat;
 use crate::constants::{HEIGHT};
 

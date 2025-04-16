@@ -1,5 +1,4 @@
-// src/main.rs
-use clipong::{Action, Ball, Bat, State, WIDTH, HEIGHT};  // assuming your crate is named "pong"
+use clipong::{Action, Ball, Bat, State, WIDTH, HEIGHT};
 
 fn main() {
     let ball = Ball::new((WIDTH / 2, HEIGHT / 2), (1, 1));
